@@ -12,12 +12,21 @@
  * limitations under the License.
  */
 
-/**
- * @namespace Conductor.Baas
- */
+import { BankSlipCreateResponse } from "./responses/bank-slip-create-response";
 
-/**
- * @module {Conductor} @zrpaplicacoes/caradhras
- * @alias nodejs-caradhras
- */
-export { BankSlip } from './bank-slip';
+export class BankSlip {
+
+  /**
+   * Creates and registers a Bank Slip
+   *
+   * @param accountId - The id of the Account
+   * @param value - The total due for this Bank Slip
+   */
+  static create(accountId: number, value: number): BankSlipCreateResponse {
+    return {
+      id: 1,
+      value: 30.0,
+      registered: true
+    };
+  }
+}

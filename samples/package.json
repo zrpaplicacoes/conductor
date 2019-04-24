@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-docs-samples-caradhras",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "typings": "../build/src/index.d.ts",
+  "dependencies": {
+    "@zrpaplicacoes/caradhras": "../"
+  },
+  "devDependencies": {
+    "ts-node": "^8.1.0",
+    "typescript": "../node_modules/typescript/"
+  }
+}

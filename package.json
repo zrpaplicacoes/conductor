@@ -26,6 +26,7 @@
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
+    "compile:watch": "tsc -w -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
