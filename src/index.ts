@@ -13,11 +13,13 @@
  */
 
 /**
- * @namespace Conductor.Baas
+ * @namespace Conductor
  */
 
 /**
  * @module {Conductor} @zrpaplicacoes/caradhras
  * @alias nodejs-caradhras
  */
-export { BankSlip } from './bank-slip';
+export * from './services';
+
+export * from './config';

@@ -55,5 +55,13 @@
     "through2": "^3.0.0",
     "typescript": "~3.1.0",
     "uuid": "^3.1.0"
+  },
+  "dependencies": {
+    "@hapi/joi": "^15.0.0",
+    "@types/joi": "^14.3.3",
+    "@types/winston": "^2.4.4",
+    "dotenv": "^7.0.0",
+    "object-mapper": "^5.0.0",
+    "winston": "^3.2.1"
   }
 }

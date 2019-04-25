@@ -7,7 +7,7 @@
     "start": "ts-node index.ts"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "typings": "../build/src/index.d.ts",
   "dependencies": {
     "@zrpaplicacoes/caradhras": "../"
