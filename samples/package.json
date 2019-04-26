@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-docs-samples-caradhras",
+  "name": "nodejs-docs-samples-conductor",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "typings": "../build/src/index.d.ts",
   "dependencies": {
-    "@zrpaplicacoes/caradhras": "../"
+    "@zrpaplicacoes/conductor": "../"
   },
   "devDependencies": {
     "ts-node": "^8.1.0",

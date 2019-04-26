@@ -17,9 +17,9 @@
  */
 
 /**
- * @module {Conductor} @zrpaplicacoes/caradhras
- * @alias nodejs-caradhras
+ * @module {Conductor} @zrpaplicacoes/conductor
+ * @alias nodejs-conductor
  */
 export * from './services';
 
-export * from './config';
+export * from './sdk';

@@ -1,13 +1,13 @@
 {
-  "name": "@zrpaplicacoes/caradhras",
-  "description": "SDK for integration between Conductor Caradhras API",
+  "name": "@zrpaplicacoes/conductor",
+  "description": "SDK for integration between Conductor conductor API",
   "version": "0.0.1",
   "license": "Apache-2.0",
   "author": "ZRP",
   "engines": {
     "node": ">=10.15.1"
   },
-  "repository": "zrpaplicacoes/caradhras",
+  "repository": "zrpaplicacoes/conductor",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
   "files": [
@@ -15,10 +15,10 @@
     "LICENSE"
   ],
   "keywords": [
-    "conductor",
+    "caradhras",
     "baas",
     "banking as a service",
-    "caradhras",
+    "conductor",
     "sdk"
   ],
   "scripts": {
@@ -33,6 +33,7 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/request": "^2.48.1",
     "codecov": "^3.0.0",
     "eslint": "^5.0.0",
     "eslint-config-prettier": "^4.0.0",
@@ -53,15 +54,17 @@
     "sinon": "^7.1.1",
     "source-map-support": "^0.5.9",
     "through2": "^3.0.0",
+    "ts-node": "^8.1.0",
     "typescript": "~3.1.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.3.2"
   },
   "dependencies": {
     "@hapi/joi": "^15.0.0",
-    "@types/joi": "^14.3.3",
-    "@types/winston": "^2.4.4",
+    "@types/dotenv": "^6.1.1",
+    "@types/hapi__joi": "^15.0.0",
     "dotenv": "^7.0.0",
     "object-mapper": "^5.0.0",
+    "request": "^2.88.0",
     "winston": "^3.2.1"
   }
 }

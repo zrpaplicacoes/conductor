@@ -12,10 +12,18 @@
  * limitations under the License.
  */
 
-import { Response } from "./response";
-import { BankSlip } from "src/models/bank-slip";
+export enum BankSlipStatus {
+  'CREATED' = 1,
+}
 
-export interface BankSlipCreateResponse {
-  data?: BankSlip;
-  response: Response;
+export interface BankSlip {
+  id: number;
+  processedAt: Date;
+  receiver: string;
+  sender: string;
+  cashierInstructions: string[];
+  paymentLocations: string[];
+  digitableLine: string;
+  status: BankSlipStatus;
+  value: number;
 }

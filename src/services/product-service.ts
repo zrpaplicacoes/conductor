@@ -12,10 +12,27 @@
  * limitations under the License.
  */
 
-import { Response } from "./response";
-import { BankSlip } from "src/models/bank-slip";
+const mapper = require('object-mapper');
 
-export interface BankSlipCreateResponse {
-  data?: BankSlip;
-  response: Response;
+import { Client, HttpMethod } from "../client";
+import { ProductListResponse } from "../responses";
+
+export class ProductService {
+  static async all(): Promise<ProductListResponse> {
+    const client: Client = new Client();
+
+    const response = await client.request(HttpMethod.GET, 'produtos');
+
+    const parsedBody = JSON.parse(response.rawBody);
+
+    const incomingMap = {
+      'id': 'id',
+      'nome': 'name',
+    };
+
+    return {
+      response,
+      data: mapper(parsedBody['content'], incomingMap),
+    };
+  }
 }

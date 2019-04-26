@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "sourceMap": true,
   },
   "include": [
     "src/*.ts",

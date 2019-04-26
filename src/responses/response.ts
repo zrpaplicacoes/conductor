@@ -12,10 +12,16 @@
  * limitations under the License.
  */
 
-import { Response } from "./response";
-import { BankSlip } from "src/models/bank-slip";
+import { IncomingHttpHeaders } from "http";
 
-export interface BankSlipCreateResponse {
-  data?: BankSlip;
-  response: Response;
+export interface Response {
+  error?: Error;
+  rawBody: string;
+  hasError: boolean;
+  isRedirect: boolean;
+  statusCode: number;
+  headers: IncomingHttpHeaders;
+  // tslint:disable-next-line:no-any
+  requestBody: any;
+  elapsedTime: number | undefined;
 }
