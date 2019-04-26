@@ -54,14 +54,14 @@ export class Client {
       }
     };
 
-    SDK.logger.info('Request started', options);
+    SDK.logger.http('Request started', options);
 
     // tslint:disable-next-line:no-any
     return new Promise<Response>((resolve, reject) => {
       request(options, (error, response, responseBody) => {
         const time = process.hrtime(start);
 
-        SDK.logger.info('Request completed', { elapsedTime: time, message: `${time[0]}s:${time[1] / 10.0 ^ 6}ms` });
+        SDK.logger.http('Request completed', { elapsedTime: time, message: `${time[0]}s:${time[1] / 10.0 ^ 6}ms` });
 
         if (error) throw new Error(error);
 
