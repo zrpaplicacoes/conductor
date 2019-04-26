@@ -16,6 +16,12 @@ export enum BankSlipStatus {
   'CREATED' = 1,
 }
 
+export enum BankSlipType {
+  PRIVATE = 7,
+  AGREEMENT = 8,
+  RECHARGE = 9
+}
+
 export interface BankSlip {
   id: number;
   processedAt: Date;

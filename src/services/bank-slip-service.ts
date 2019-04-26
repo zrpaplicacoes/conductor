@@ -15,10 +15,11 @@
 const mapper = require('object-mapper');
 
 import { SDK } from "../sdk";
-import { BankSlipCreateRequest, BankSlipType } from "../requests";
+import { BankSlipCreateRequest } from "../requests";
 import { BankSlipCreateResponse, Response } from "../responses";
 import { bankSlipCreateRequestValidator, bankSlipDownloadRequestValidator } from "../validations";
 import { Client, HttpMethod } from "../client";
+import { BankSlipType } from "../models";
 
 export class BankSlipService {
   /**

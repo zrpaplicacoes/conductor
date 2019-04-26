@@ -20,6 +20,31 @@
  * @module {Conductor} @zrpaplicacoes/conductor
  * @alias nodejs-conductor
  */
-export * from './services';
+export {
+  BankSlipService,
+  ProductService,
+} from './services';
 
-export * from './sdk';
+export {
+  BankSlip,
+  BankSlipStatus,
+  BankSlipType,
+  Product,
+} from './models';
+
+export {
+  BankSlipCreateRequest,
+} from './requests';
+
+export {
+  Response,
+  BankSlipCreateResponse,
+  ProductListResponse,
+} from './responses';
+
+export {
+  Config,
+  Environment,
+  LogLevel,
+  SDK,
+} from './sdk';

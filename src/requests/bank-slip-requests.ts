@@ -1,8 +1,4 @@
-export enum BankSlipType {
-  PRIVATE = 7,
-  AGREEMENT = 8,
-  RECHARGE = 9
-}
+import { BankSlipType } from "../models";
 
 export interface BankSlipCreateRequest {
   accountId: number;
