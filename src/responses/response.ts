@@ -23,5 +23,15 @@ export interface Response {
   headers: IncomingHttpHeaders;
   // tslint:disable-next-line:no-any
   requestBody: any;
-  elapsedTime: number | undefined;
+  elapsedTime: [number, number] | number | undefined;
+}
+
+export interface FileResponse {
+  error?: Error;
+  absolutePath?: string;
+  fileId?: string;
+  hasError: boolean;
+  statusCode: number;
+  headers: IncomingHttpHeaders;
+  elapsedTime: [number, number] | number | undefined;
 }

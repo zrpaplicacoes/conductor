@@ -45,6 +45,10 @@ export {
 export {
   Config,
   Environment,
-  LogLevel,
   SDK,
 } from './sdk';
+
+export {
+  Logger,
+  LogLevel,
+} from './logger';

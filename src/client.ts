@@ -13,12 +13,10 @@
  */
 
 
-const uuid = require('uuid/v4');
 import * as request from 'request';
-import * as fs from 'fs';
 
 import { SDK } from './sdk';
-import { Response } from './responses';
+import { Response, FileResponse } from './responses';
 
 export enum HttpMethod {
   GET = 'GET',
@@ -39,11 +37,14 @@ export class Client {
     qs?: any,
     // tslint:disable-next-line:no-any
   ): Promise<Response> {
+    const start = process.hrtime();
+
     const options: request.UrlOptions & request.CoreOptions = {
       url: this.url(path),
       method,
       qs,
       body,
+      timeout: SDK.defaultTimeout,
       headers:
       {
         'Cache-Control': 'no-cache',
@@ -53,12 +54,18 @@ export class Client {
       }
     };
 
+    SDK.logger.info('Request started', options);
+
     // tslint:disable-next-line:no-any
     return new Promise<Response>((resolve, reject) => {
       request(options, (error, response, responseBody) => {
+        const time = process.hrtime(start);
+
+        SDK.logger.info('Request completed', { elapsedTime: time, message: `${time[0]}s:${time[1] / 10.0 ^ 6}ms` });
+
         if (error) throw new Error(error);
 
-        if (response.statusCode.toString().match(/(2,3)\d{2}/)) {
+        if (response.statusCode.toString().match(/(2|3)\d{2}/) !== null) {
           resolve({
             rawBody: responseBody,
             hasError: false,
@@ -66,7 +73,7 @@ export class Client {
             statusCode: response.statusCode,
             headers: response.headers,
             requestBody: qs || body,
-            elapsedTime: response.elapsedTime,
+            elapsedTime: time,
           });
         } else {
           resolve({
@@ -77,15 +84,15 @@ export class Client {
             statusCode: response.statusCode,
             headers: response.headers,
             requestBody: qs || body,
-            elapsedTime: response.elapsedTime,
+            elapsedTime: time,
           });
         }
       });
     });
   }
 
-  async download(method: HttpMethod, path: string, mime: string) {
-    const filename: string = uuid();
+  async download(method: HttpMethod, path: string, mime?: string, extension?: string): Promise<FileResponse> {
+    const start = process.hrtime();
 
     const options: request.UrlOptions & request.CoreOptions = {
       url: this.url(path),
@@ -97,11 +104,32 @@ export class Client {
       }
     };
 
-    return new Promise((resolve, reject) => {
-      const path: string = SDK.write(new Buffer('abcasd123123'));
+    return new Promise<FileResponse>((resolve, reject) => {
+      const streamable = SDK.createWriteStream(extension);
 
-      resolve({
-        path
+      const r: request.Request = request(options);
+
+      r.on('error', (error: Error) => {
+        const res: request.Response | undefined = r.response;
+
+        reject({
+          error,
+          statusCode: res && res.statusCode,
+          headers: res && res.headers,
+          elapsedTime: process.hrtime(start),
+          hasError: true,
+        } as FileResponse);
+      }).pipe(streamable.writeStream).on('close', () => {
+        const res: request.Response | undefined = r.response;
+
+        resolve({
+          absolutePath: streamable.absolutePath,
+          fileId: streamable.fileId,
+          statusCode: res && res.statusCode,
+          headers: res && res.headers,
+          elapsedTime: process.hrtime(start),
+          hasError: false,
+        } as FileResponse);
       });
     });
   }

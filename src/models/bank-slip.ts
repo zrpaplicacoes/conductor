@@ -14,6 +14,7 @@
 
 export enum BankSlipStatus {
   'CREATED' = 1,
+  'REGISTERED' = 3,
 }
 
 export enum BankSlipType {
@@ -30,6 +31,7 @@ export interface BankSlip {
   cashierInstructions: string[];
   paymentLocations: string[];
   digitableLine: string;
+  barcode: string;
   status: BankSlipStatus;
   value: number;
 }

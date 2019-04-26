@@ -4,11 +4,9 @@ import * as dotenv from 'dotenv';
 
 import * as request from 'request';
 import * as fs from 'fs';
-import { URL } from 'url';
 
 import { noop } from './util';
-
-
+import { Logger, LogLevel, createLogger } from './logger';
 
 /**
  * @internal
@@ -34,32 +32,41 @@ export enum Environment {
   prod = 'prod'
 }
 
-export enum LogLevel {
-  DEBUG,
-  INFO,
-  WARNING,
-  ERROR,
-}
-
 export interface Config {
   env?: Environment;
   clientId?: string;
   clientSecret?: string;
   logLevel?: LogLevel;
   validate?: boolean;
+
+  /**
+   * The default timeout (in seconds) for the SDK.
+   *
+   * After the specified time, the connection is closed and the request
+   * will raise an Error.
+   */
+  timeout?: number;
+  logger?: Logger;
   productId: number;
   plasticId: number;
   comercialOriginId: number;
 }
 
+const VERSION: string = require('../../package.json').version;
+
 export class SDK {
   private static _instance: SDK;
+  static VERSION = VERSION;
 
   private _env: Environment;
   private _logLevel: LogLevel;
   private _clientId: string;
   private _clientSecret: string;
   private _validate: boolean;
+  private _logger: Logger;
+  private _timeout: number;
+
+
   private _productId: number | undefined;
   private _plasticId: number | undefined;
   private _comercialOriginId: number | undefined;
@@ -74,8 +81,10 @@ export class SDK {
     this._env = (c && c.env) || Environment.staging;
     this._clientId = (c && c.clientId) || process.env['CDT_CLIENT_ID'] as string;
     this._clientSecret = (c && c.clientSecret) || process.env['CDT_CLIENT_SECRET'] as string;
-    this._logLevel = (c && c.logLevel) || LogLevel.DEBUG;
+    this._logLevel = (c && c.logLevel) || LogLevel.silly;
     this._validate = (c && c.validate) || false;
+    this._timeout = (c && c.timeout) || 30;
+    this._logger = (c && c.logger) || createLogger(this._logLevel);
 
     this._productId = c && c.productId;
     this._plasticId = c && c.plasticId;
@@ -126,13 +135,15 @@ export class SDK {
     return SDK._instance;
   }
 
-  static write(b: Buffer): string {
+  static createWriteStream(extension?: string): { writeStream: fs.WriteStream, absolutePath: string, fileId: string } {
     const id: string = uuid();
-    const path: string = SDK._instance._dir + `/${id}`;
+    const path: string = SDK._instance._dir + `/${id}` + `${extension ? '.' + extension : ''}`;
 
-    fs.writeFileSync(path, b, { encoding: 'utf-8' });
-
-    return path;
+    return {
+      absolutePath: path,
+      fileId: id,
+      writeStream: fs.createWriteStream(path, { encoding: 'utf-8', autoClose: true }),
+    };
   }
 
   static get isValidationEnabled(): boolean {
@@ -141,6 +152,14 @@ export class SDK {
 
   static get isProd(): boolean {
     return SDK._instance._env === Environment.prod;
+  }
+
+  static get defaultTimeout(): number {
+    return SDK._instance._timeout * 1000;
+  }
+
+  static get logger(): Logger {
+    return SDK._instance._logger;
   }
 
   private onToken(response: OAuth2Response) {

@@ -12,15 +12,18 @@
  * limitations under the License.
  */
 
-import * as Conductor from '@zrpaplicacoes/conductor';
-import { BankSlipType } from '../build/src/requests';
+import {
+  Environment,
+  LogLevel,
+  SDK,
+  BankSlipService,
+  ProductService,
+} from '@zrpaplicacoes/conductor';
 
-Conductor.SDK.config({
-  env: Conductor.Environment.staging,
-  logLevel: Conductor.LogLevel.DEBUG,
+SDK.config({
+  env: Environment.staging,
+  logLevel: LogLevel.silly,
   validate: true,
-  clientId: '5j056414cnaj5tlndgf1eic9eb',
-  clientSecret: '9a2to25n5eus7kr25915sbd7j0rl9sp51qv57arvo0ecfjhl56h',
   productId: 1,
   comercialOriginId: 1,
   plasticId: 2,
@@ -28,23 +31,23 @@ Conductor.SDK.config({
 
 (async () => {
   // Bank Slip
-  const bankSlipResponse = await Conductor.BankSlipService.create({
-    accountId: 9,
+  const bankSlipResponse = await BankSlipService.create({
+    accountId: 50,
     value: 100.0,
-    type: BankSlipType.PRIVATE,
   });
 
-  console.log(bankSlipResponse.data);
+  SDK.logger.info('bankSlipResponse', bankSlipResponse.data);
 
   const bankSlipId = bankSlipResponse.data ? bankSlipResponse.data.id : null;
 
   if (bankSlipId) {
-    const file = await Conductor.BankSlipService.download(bankSlipId);
+    const file = await BankSlipService.download(bankSlipId);
 
-    console.log(file);
+    SDK.logger.info('Downloaded BankSlip', file);
   }
 
-
   // Product
-  await Conductor.ProductService.all().then((r) => console.log(r.data)).catch(e => console.error(e));
+  await ProductService.all().then((r) => SDK.logger.info('Response', r.data)).catch(e => SDK.logger.error('Error', e));
+
+  process.exit(0);
 })();

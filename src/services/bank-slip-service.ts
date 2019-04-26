@@ -16,27 +16,70 @@ const mapper = require('object-mapper');
 
 import { SDK } from "../sdk";
 import { BankSlipCreateRequest } from "../requests";
-import { BankSlipCreateResponse, Response } from "../responses";
-import { bankSlipCreateRequestValidator, bankSlipDownloadRequestValidator } from "../validations";
+import { BankSlipCreateResponse, Response, BankSlipGetResponse, FileResponse } from "../responses";
+import { bankSlipCreateRequestValidator, bankSlipIdValidator } from "../validations";
 import { Client, HttpMethod } from "../client";
 import { BankSlipType } from "../models";
 
 export class BankSlipService {
+  // tslint:disable-next-line:no-any
+  private static incomingMapper: any = {
+    'id': 'id',
+    'dataProcessamento': {
+      key: 'processedAt',
+      transform: (v: string) => v && (new Date(v)),
+    },
+    'nomeBeneficiario': 'receiver',
+    'instrucoes': 'cashierInstructions',
+    'locaisDePagamento': {
+      key: 'paymentLocations',
+      transform: (v: string[]) => v && v.filter(value => !!value),
+    },
+    'nomePagador': 'sender',
+    'linhaDigitavel': {
+      key: 'digitableLine',
+      transform: (v: string) => v && v.replace(/(\s|\.)/ig, ""),
+    },
+    'codigoDeBarras': 'barcode',
+    'status': 'status',
+    'valorBoleto': 'value'
+  };
+
+  /**
+   *
+   * @param id - The Bank Slip ID
+   * @returns {BankSlipGetResponse}
+   */
+  static async get(id: number): Promise<BankSlipGetResponse> {
+    const client: Client = new Client();
+
+    if (SDK.isValidationEnabled) {
+      id = await bankSlipIdValidator(id);
+    }
+
+    const response: Response = await client.request(HttpMethod.GET, `boletos/${id}`);
+
+    return {
+      response,
+      data: mapper(JSON.parse(response.rawBody, BankSlipService.incomingMapper)),
+    };
+
+  }
   /**
    *
    * @param payload - The BankSlipCreateRequest requires an accountId and
    * a minimal value of 0.01 to create a BankSlip, by default, the bank slip
-   * is recorded as a private bank slip. Also, by default, the dueDate
-   * for the ticket is set for 2 business days from now
+   * is recorded as a recharge bank slip. Also, by default, the dueDate
+   * for the ticket is set for the next business day
    */
   static async create(payload: BankSlipCreateRequest): Promise<BankSlipCreateResponse> {
     const client: Client = new Client();
 
     payload = {
       ...{
-        type: BankSlipType.PRIVATE,
+        type: BankSlipType.RECHARGE,
         // TODO: Change here to actually compute business days
-        dueDate: new Date(Date.now() + (3600 * 48 * 1000)),
+        dueDate: new Date(Date.now() + (3600 * 72 * 1000)),
       },
       ...payload,
     };
@@ -48,37 +91,26 @@ export class BankSlipService {
     const outgoingMap = {
       'accountId': 'idConta',
       'type': 'tipoBoleto',
-      'dueDate': 'dataVencimento',
+      'dueDate': {
+        key: 'dataVencimento',
+        transform: (v: Date) => v.toISOString().substring(0, 10)
+      },
       'value': 'valor',
     };
 
-    payload = mapper(payload, outgoingMap);
+    const convertedPayload = mapper(payload, outgoingMap);
+
+    SDK.logger.info('BankSlipService.create: Payload was converted', { from: payload, to: convertedPayload });
 
     const response: Response = await client.request(HttpMethod.GET, 'billet', null, payload);
 
-    const parsedBody = JSON.parse(response.rawBody);
+    // SDK.logger.silly(response);
 
-    const incomingMap = {
-      'id': 'id',
-      'dataProcessamento': {
-        key: 'processedAt',
-        transform: (v: string) => (new Date(v)),
-      },
-      'nomeBeneficiario': 'receiver',
-      'instrucoes': 'cashierInstructions',
-      'locaisDePagamento': 'paymentLocations',
-      'nomePagador': 'sender',
-      'linhaDigitavel': {
-        key: 'digitableLine',
-        transform: (v: string) => v.replace(/(\s|\.)/ig, ""),
-      },
-      'status': 'status',
-      'valorBoleto': 'value'
-    };
+    const parsedBody = JSON.parse(response.rawBody);
 
     return {
       response,
-      data: mapper(parsedBody, incomingMap),
+      data: mapper(parsedBody, BankSlipService.incomingMapper),
     };
   }
 
@@ -86,19 +118,21 @@ export class BankSlipService {
   /**
    *
    * @param id - The Bank Slip ID
-   * @returns {Buffer}
+   * @returns {string} - The absolute path for the file in the fs
    */
-  // tslint:disable-next-line:no-any
-  static async download(id: number): Promise<any> {
+  static async download(id: number): Promise<FileResponse> {
     const client: Client = new Client();
 
     if (SDK.isValidationEnabled) {
-      id = await bankSlipDownloadRequestValidator(id);
+      id = await bankSlipIdValidator(id);
     }
 
     // tslint:disable-next-line:no-any
-    const response: any = await client.download(HttpMethod.GET, `boletos/${id}/pdf`, 'application/pdf');
-
-    return response;
+    return await client.download(
+      HttpMethod.GET,
+      `boletos/${id}/pdf`,
+      'application/pdf',
+      'pdf',
+    );
   }
 }

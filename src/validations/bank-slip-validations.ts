@@ -18,7 +18,7 @@ export async function bankSlipCreateRequestValidator(r: BankSlipCreateRequest): 
   });
 }
 
-export async function bankSlipDownloadRequestValidator(id: number) {
+export async function bankSlipIdValidator(id: number) {
   return new Promise<number>((resolve, reject) => {
     try {
       Joi.assert(id, Joi.number().required().positive());

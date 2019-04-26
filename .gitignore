@@ -16,3 +16,6 @@ google-cloud-logging-bunyan-*.tgz
 .env
 **/.env
 tmp/
+log/
+**/log*
+

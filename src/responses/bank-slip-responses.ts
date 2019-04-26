@@ -19,3 +19,8 @@ export interface BankSlipCreateResponse {
   data?: BankSlip;
   response: Response;
 }
+
+export interface BankSlipGetResponse {
+  data?: BankSlip;
+  response: Response;
+}
